@@ -2,8 +2,12 @@ package main
 
 import (
 	"bufio"
+	"flag"
+	"fmt"
 	"os"
 	"time"
+
+	tm "github.com/buger/goterm"
 )
 
 type point struct {
@@ -85,31 +89,59 @@ func (g *grid) getNextLiveCells(liveCells map[point]bool) map[point]bool {
 }
 
 func convertInputLineToPoints(y int, line string) []point {
-	return []point{}
+	// line should be a series of 0s and 1s, like "00010011010"
+	result := make([]point, len(line))
+	for i, c := range line {
+		if c == '1' {
+			result = append(result, point{i, y})
+		}
+	}
+	return result
 }
 
 func main() {
-	// TODO get these from command line
-	maxX := 10
-	maxY := 10
-	interval := 500
+	maxXPtr := flag.Int("maxX", 10, "grid X boundary")
+	maxYPtr := flag.Int("maxY", 10, "grid Y boundary")
+	intervalPtr := flag.Int("interval", 500, "time between game ticks (in milliseconds)")
+	flag.Parse()
 
 	scanner := bufio.NewScanner(os.Stdin)
 	liveCells := map[point]bool{}
 	currentY := 0
 	for scanner.Scan() {
-		for _, cell := range convertInputLineToPoints(currentY, scanner.Text()) {
+		line := scanner.Text()
+		if len(line) == 0 {
+			fmt.Println("breaking")
+			break
+		}
+		for _, cell := range convertInputLineToPoints(currentY, line) {
 			liveCells[cell] = true
 		}
+		currentY++
 	}
 	if scanner.Err() != nil {
 		panic(scanner.Err())
 	}
+	fmt.Print("liveCells", liveCells)
 
-	g := initializeGrid(maxX, maxY)
+	g := initializeGrid(*maxXPtr, *maxYPtr)
 	for {
-		// TODO print to screen
+		fmt.Println("main loop")
+		tm.Clear()
+		tm.MoveCursor(1, 1)
+		// flip X and Y to make it appear normal on command line
+		for i := 0; i < g.maxY; i++ {
+			for j := 0; j < g.maxX; j++ {
+				if liveCells[point{j, i}] {
+					tm.Print(tm.Color("O", tm.GREEN))
+				} else {
+					tm.Print(tm.Color("O", tm.RED))
+				}
+			}
+			tm.Println()
+		}
+		tm.Flush()
 		liveCells = g.getNextLiveCells(liveCells)
-		time.Sleep(time.Duration(interval) * time.Millisecond)
+		time.Sleep(time.Duration(*intervalPtr) * time.Millisecond)
 	}
 }
