@@ -9,12 +9,29 @@ brew install go # (if you don't already have go installed)
 go build
 ```
 
-## Example
-`gameoflife` takes input from stdin. You can seed a grid by typing on the fly, or you can `cat` a given example file to see cool patterns.
+Alternatively, download the binary with `go get` (nifty!)
 ```
-go build
+go get github.com/cjlint/gameoflifedemo
+$(go env GOPATH)/bin/gameoflifedemo
+```
+
+## Example
+`gameoflife` takes input from stdin. You can `cat` a given example file to see cool patterns.
+```
 cat examples/turns_into_a_loaf | ./gameoflife
 cat examples/glider | ./gameoflife --maxX 50 --maxY 50
+```
+
+Or you can seed a grid by typing 0s and 1s directly to stdin, followed by an empty line
+```
+./gameoflife
+0010010011
+1001001
+01010111001
+10
+100
+10010
+
 ```
 
 ## Command line args
