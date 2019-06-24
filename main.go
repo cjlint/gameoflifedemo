@@ -121,7 +121,7 @@ func convertInputToSeed() map[point]bool {
 func main() {
 	maxXPtr := flag.Int("maxX", 10, "grid X boundary")
 	maxYPtr := flag.Int("maxY", 10, "grid Y boundary")
-	intervalPtr := flag.Int("interval", 500, "time between game ticks (in milliseconds)")
+	intervalPtr := flag.Int("interval", 200, "time between game ticks (in milliseconds)")
 	flag.Parse()
 
 	liveCells := convertInputToSeed()
