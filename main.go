@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"flag"
-	"fmt"
 	"os"
 	"time"
 
@@ -90,7 +89,7 @@ func (g *grid) getNextLiveCells(liveCells map[point]bool) map[point]bool {
 
 func convertInputLineToPoints(y int, line string) []point {
 	// line should be a series of 0s and 1s, like "00010011010"
-	result := make([]point, len(line))
+	result := []point{}
 	for i, c := range line {
 		if c == '1' {
 			result = append(result, point{i, y})
@@ -99,19 +98,13 @@ func convertInputLineToPoints(y int, line string) []point {
 	return result
 }
 
-func main() {
-	maxXPtr := flag.Int("maxX", 10, "grid X boundary")
-	maxYPtr := flag.Int("maxY", 10, "grid Y boundary")
-	intervalPtr := flag.Int("interval", 500, "time between game ticks (in milliseconds)")
-	flag.Parse()
-
+func convertInputToSeed() map[point]bool {
 	scanner := bufio.NewScanner(os.Stdin)
 	liveCells := map[point]bool{}
 	currentY := 0
 	for scanner.Scan() {
 		line := scanner.Text()
 		if len(line) == 0 {
-			fmt.Println("breaking")
 			break
 		}
 		for _, cell := range convertInputLineToPoints(currentY, line) {
@@ -122,11 +115,18 @@ func main() {
 	if scanner.Err() != nil {
 		panic(scanner.Err())
 	}
-	fmt.Print("liveCells", liveCells)
+	return liveCells
+}
 
+func main() {
+	maxXPtr := flag.Int("maxX", 10, "grid X boundary")
+	maxYPtr := flag.Int("maxY", 10, "grid Y boundary")
+	intervalPtr := flag.Int("interval", 500, "time between game ticks (in milliseconds)")
+	flag.Parse()
+
+	liveCells := convertInputToSeed()
 	g := initializeGrid(*maxXPtr, *maxYPtr)
 	for {
-		fmt.Println("main loop")
 		tm.Clear()
 		tm.MoveCursor(1, 1)
 		// flip X and Y to make it appear normal on command line

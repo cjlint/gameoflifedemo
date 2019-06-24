@@ -194,3 +194,20 @@ func Test_grid_getNextLiveCells(t *testing.T) {
 		})
 	}
 }
+
+func Test_convertInputLineToPoints(t *testing.T) {
+	tests := []struct {
+		name string
+		line string
+		want []point
+	}{
+		{"make sure point 0,0 isn't set to alive for no reason", "00000", []point{}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := convertInputLineToPoints(0, tt.line); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("convertInputLineToPoints() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
